@@ -2326,5 +2326,7 @@
     "no-saved-addresses": "No saved addresses",
     "you-like-to-type-43-characters": "You like to type 43 characters?",
     "no-other-accounts": "No other accounts",
-    "here-is-a-cat-in-a-box-instead": "Here’s a cat in a box instead"
+    "here-is-a-cat-in-a-box-instead": "Here’s a cat in a box instead",
+    "type-pairing-code": "Type or paste pairing code",
+    "scan-sync-code-placeholder": "cs2:4FH..."
 }
