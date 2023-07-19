@@ -12,18 +12,10 @@
   (merge
    {:background-color (:ui-background @colors/theme)}
    (when (and offset platform/android?)
-     {:elevation (animated/interpolate
-                  value
-                  {:inputRange  [0 offset]
-                   :outputRange [0 4]
-                   :extrapolate (:clamp animated/extrapolate)})})
+     {:elevation 2})
    (when (and offset platform/ios?)
      {:z-index        2
-      :shadow-opacity (animated/interpolate
-                       value
-                       {:inputRange  [0 offset]
-                        :outputRange [0 1]
-                        :extrapolate (:clamp animated/extrapolate)})
+      :shadow-opacity 0.4
       :shadow-radius  16
       :shadow-color   (:shadow-01 @colors/theme)
       :shadow-offset  {:width 0 :height 4}})))
@@ -36,13 +28,13 @@
 
 (defn header-container
   []
-  (let [y               (animated/value 0)
-        animation-value (animated/value 0)
-        animation       (animated/with-timing-transition
-                         animation-value
-                         {:duration 250
-                          :easing   (:ease-in animated/easings)})
-        on-scroll       (animated/on-scroll {:y y})
+  (let [y               0 ;;(animated/value 0)
+        animation-value 0 ;;(animated/value 0)
+        ;        animation       (animated/with-timing-transition
+        ;                         animation-value
+        ;                         {:duration 250
+        ;                          :easing   (:ease-in animated/easings)})
+;        on-scroll       (animated/on-scroll {:y y})
         layout          (reagent/atom {})
         offset          (reagent/atom 0)
         on-layout       (fn [evt]
@@ -51,13 +43,15 @@
       [animated/view
        {:flex           1
         :pointer-events :box-none}
-       [animated/code
-        {:key  (str @offset)
-         :exec (animated/cond*
-                (animated/and* (animated/greater-or-eq y @offset)
-                               (animated/greater-or-eq y 1))
-                (animated/set animation-value 1)
-                (animated/set animation-value 0))}]
+       ;commented out to upgrade react-native-reanimated to v3 and react-native to 0.72
+       ;TODO: replace this with an updated implementation
+       ;       [animated/code
+       ;        {:key  (str @offset)
+       ;         :exec (animated/cond*
+       ;                (animated/and* (animated/greater-or-eq y @offset)
+       ;                               (animated/greater-or-eq y 1))
+       ;                (animated/set animation-value 1)
+       ;                (animated/set animation-value 0))}]
        [animated/view
         {:pointer-events :box-none
          :style          (header-wrapper-style {:value  y
@@ -69,28 +63,30 @@
            :title-component [animated/view {:style (title-style @layout)}
                              [extended-header
                               {:value     y
-                               :animation animation
+                               ;                               :animation animation
                                :minimized true
                                :offset    @offset}]]
            :title-align     :left}
           (dissoc props :extended-header))]]
-       (into [animated/scroll-view
-              {:on-scroll           on-scroll
-               :refreshControl      (when refresh-control
-                                      (refresh-control
-                                       (and @refreshing-sub
-                                            @refreshing-counter)))
-               :style               {:z-index 1}
-               :scrollEventThrottle 16}
-              [animated/view {:pointer-events :box-none}
-               [animated/view
-                {:pointer-events :box-none
-                 :on-layout      on-layout}
-                [extended-header
-                 {:value     y
-                  :animation animation
-                  :offset    @offset}]]]]
-             children)])))
+              (into [animated/scroll-view
+                     {
+;                       :on-scroll           on-scroll
+                      :refreshControl      (when refresh-control
+                                             (refresh-control
+                                              (and @refreshing-sub
+                                                   @refreshing-counter)))
+                      :style               {:z-index 1}
+                      :scrollEventThrottle 16}
+                     [animated/view {:pointer-events :box-none}
+                      [animated/view
+                       {:pointer-events :box-none
+                        :on-layout      on-layout}
+                       [extended-header
+                        {:value     y
+       ;                  :animation animation
+                         :offset    @offset}]]]]
+                    children)
+      ])))
 
 (defn header
   [{:keys [use-insets] :as props} & children]
