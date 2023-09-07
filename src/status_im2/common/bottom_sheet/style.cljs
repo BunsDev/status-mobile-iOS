@@ -48,7 +48,7 @@
   [theme window-height sheet-height {:keys [top]}]
   {:position          :absolute
    :bottom            10
-   :max-height        (- window-height sheet-height top)
+   :max-height        (- window-height sheet-height top 26)
    :overflow          :hidden
    :left              0
    :right             0
