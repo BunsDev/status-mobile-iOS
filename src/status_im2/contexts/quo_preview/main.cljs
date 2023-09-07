@@ -340,7 +340,7 @@
                        {:name      :data-item
                         :component data-item/preview-data-item}]
    :share             [{:name      :qr-code
-                        :component qr-code/preview-qr-code}
+                        :component qr-code/preview}
                        {:name      :share-qr-code
                         :component share-qr-code/preview-share-qr-code}]
    :tabs              [{:name      :segmented

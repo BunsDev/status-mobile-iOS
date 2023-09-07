@@ -309,7 +309,7 @@
 (def data-item quo2.components.settings.data-item.view/view)
 
 ;;;; Share
-(def qr-code quo2.components.share.qr-code.view/qr-code)
+(def qr-code quo2.components.share.qr-code.view/view)
 (def share-qr-code quo2.components.share.share-qr-code.view/view)
 
 ;;;; Tabs
