@@ -5,7 +5,6 @@
             [react-native.core :as rn]
             [react-native.hooks :as hooks]
             [reagent.core :as reagent]
-            [status-im2.common.qr-code-viewer.view :as qr-code-viewer]
             [status-im2.common.resources :as resources]
             [status-im2.contexts.syncing.setup-syncing.style :as style]
             [status-im2.contexts.syncing.sheets.enter-password.view :as enter-password]
@@ -68,13 +67,19 @@
             :weight :semi-bold
             :style  {:color colors/white}}
            (i18n/label :t/setup-syncing)]]
-         [rn/view {:style (style/qr-container (sync-utils/valid-connection-string? @code))}
+         [rn/view {:style style/qr-container}
           (if (sync-utils/valid-connection-string? @code)
-            [qr-code-viewer/qr-code-view 331 @code]
             [quo/qr-code
+             {:media-server-port (rf/sub [:mediaserver/port])
+              :url               @code}]
+            [rn/image
              {:source (resources/get-image :qr-code)
-              :height 220
-              :width  "100%"}])
+              :style  {:flex             1
+                       :height           "100%"
+                       :width            "100%"
+                       :border-radius    12
+                       :background-color colors/white-opa-70
+                       :aspect-ratio     1}}])
           (when-not (sync-utils/valid-connection-string? @code)
             [quo/button
              {:on-press            (fn []

@@ -19,15 +19,12 @@
 (def sync-code
   {:margin-top 36})
 
-(defn qr-container
-  [valid-code?]
-  (merge {:margin-top       12
-          :background-color colors/white-opa-5
-          :border-radius    20
-          :padding          12}
-         (if valid-code?
-           {:flex 1}
-           {:aspect-ratio 1})))
+(def qr-container
+  {:margin-top       12
+   :background-color colors/white-opa-5
+   :border-radius    20
+   :padding          12
+   :flex             1})
 
 (def sub-text-container
   {:margin-bottom   8
