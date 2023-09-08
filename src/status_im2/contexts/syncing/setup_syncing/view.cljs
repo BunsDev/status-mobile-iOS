@@ -5,6 +5,7 @@
             [react-native.core :as rn]
             [react-native.hooks :as hooks]
             [reagent.core :as reagent]
+            [status-im2.common.qr-codes.view :as qr-codes]
             [status-im2.common.resources :as resources]
             [status-im2.contexts.syncing.setup-syncing.style :as style]
             [status-im2.contexts.syncing.sheets.enter-password.view :as enter-password]
@@ -69,9 +70,7 @@
            (i18n/label :t/setup-syncing)]]
          [rn/view {:style style/qr-container}
           (if (sync-utils/valid-connection-string? @code)
-            [quo/qr-code
-             {:media-server-port (rf/sub [:mediaserver/port])
-              :url               @code}]
+            [qr-codes/qr-code {:url @code}]
             [rn/image
              {:source (resources/get-image :qr-code)
               :style  {:flex             1
