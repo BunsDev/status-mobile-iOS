@@ -217,13 +217,12 @@
            left-side-alignment icon-color icon-bg-color
            title subtitle subtitle-secondary active on-press on-long-press chevron size text-size
            accessory-text accessibility-label title-accessibility-label accessory-style
-           haptic-feedback haptic-type error animated animated-accessory? title-text-weight
+           haptic-feedback haptic-type error animated-accessory? title-text-weight
            container-style
            active-background-enabled background-color]
     :or   {subtitle-max-lines        1
            theme                     :main
            haptic-feedback           true
-           animated                  platform/ios?
            active-background-enabled true
            haptic-type               :selection}}]
   (let [theme (if disabled :disabled theme)

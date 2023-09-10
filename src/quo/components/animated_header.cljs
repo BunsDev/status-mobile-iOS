@@ -8,7 +8,7 @@
             [react-native.safe-area :as safe-area]))
 
 (defn header-wrapper-style
-  [{:keys [value offset]}]
+  [{:keys [_ offset]}]
   (merge
    {:background-color (:ui-background @colors/theme)}
    (when (and offset platform/android?)
@@ -29,12 +29,12 @@
 (defn header-container
   []
   (let [y               0 ;;(animated/value 0)
-        animation-value 0 ;;(animated/value 0)
+        ;        animation-value (animated/value 0)
         ;        animation       (animated/with-timing-transition
         ;                         animation-value
         ;                         {:duration 250
         ;                          :easing   (:ease-in animated/easings)})
-;        on-scroll       (animated/on-scroll {:y y})
+        ;        on-scroll       (animated/on-scroll {:y y})
         layout          (reagent/atom {})
         offset          (reagent/atom 0)
         on-layout       (fn [evt]
@@ -68,24 +68,23 @@
                                :offset    @offset}]]
            :title-align     :left}
           (dissoc props :extended-header))]]
-              (into [animated/scroll-view
-                     {
-;                       :on-scroll           on-scroll
-                      :refreshControl      (when refresh-control
-                                             (refresh-control
-                                              (and @refreshing-sub
-                                                   @refreshing-counter)))
-                      :style               {:z-index 1}
-                      :scrollEventThrottle 16}
-                     [animated/view {:pointer-events :box-none}
-                      [animated/view
-                       {:pointer-events :box-none
-                        :on-layout      on-layout}
-                       [extended-header
-                        {:value     y
-       ;                  :animation animation
-                         :offset    @offset}]]]]
-                    children)
+       (into [animated/scroll-view
+              {;                       :on-scroll           on-scroll
+               :refreshControl      (when refresh-control
+                                      (refresh-control
+                                       (and @refreshing-sub
+                                            @refreshing-counter)))
+               :style               {:z-index 1}
+               :scrollEventThrottle 16}
+              [animated/view {:pointer-events :box-none}
+               [animated/view
+                {:pointer-events :box-none
+                 :on-layout      on-layout}
+                [extended-header
+                 {:value  y
+                  ;                  :animation animation
+                  :offset @offset}]]]]
+             children)
       ])))
 
 (defn header
