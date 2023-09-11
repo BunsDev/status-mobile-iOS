@@ -28,17 +28,17 @@
 
 (defn header-container
   []
-  (let [y               0 ;;(animated/value 0)
+  (let [y         0 ;;(animated/value 0)
         ;        animation-value (animated/value 0)
         ;        animation       (animated/with-timing-transition
         ;                         animation-value
         ;                         {:duration 250
         ;                          :easing   (:ease-in animated/easings)})
         ;        on-scroll       (animated/on-scroll {:y y})
-        layout          (reagent/atom {})
-        offset          (reagent/atom 0)
-        on-layout       (fn [evt]
-                          (reset! offset (oget evt "nativeEvent" "layout" "height")))]
+        layout    (reagent/atom {})
+        offset    (reagent/atom 0)
+        on-layout (fn [evt]
+                    (reset! offset (oget evt "nativeEvent" "layout" "height")))]
     (fn [{:keys [extended-header refresh-control refreshing-sub refreshing-counter] :as props} children]
       [animated/view
        {:flex           1
