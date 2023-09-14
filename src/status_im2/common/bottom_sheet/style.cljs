@@ -3,6 +3,8 @@
             [quo2.theme :as theme]
             [react-native.platform :as platform]))
 
+(def bottom-margin 8)
+
 (defn handle
   [theme]
   {:width            32
@@ -47,8 +49,9 @@
 (defn selected-item
   [theme window-height sheet-height {:keys [top]}]
   {:position          :absolute
-   :bottom            10
-   :max-height        (- window-height sheet-height top 26)
+   :bottom            bottom-margin
+   ;; we minus 8 on the max-height since the bottom has a margin of 8
+   :max-height        (- window-height sheet-height top bottom-margin)
    :overflow          :hidden
    :left              0
    :right             0
