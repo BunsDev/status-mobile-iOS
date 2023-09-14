@@ -16,13 +16,13 @@
                                  [size-key :border-radius (properties/border-type type)])]
     (case type
       :user                        [user-avatar/user-avatar
-                                    (merge {:ring?             false
-                                            :status-indicator? false
-                                            :size              user-avatar-size}
-                                           item)]
+                                    (assoc item
+                                           :ring?             false
+                                           :status-indicator? false
+                                           :size              user-avatar-size)]
 
       :accounts                    [account-avatar/view
-                                    (merge item {:size size})]
+                                    (assoc item :size size)]
 
       (:communities :collectibles) [fast-image/fast-image
                                     {:source (or (:source item) item)
@@ -64,13 +64,13 @@
   "[preview-list opts items]
    opts
    {:type          :user/:communities/:accounts/:tokens/:collectibles/:dapps/:network
-    :size          :size/s-32 | :size/s-24 | :size/s-20 | :size/s-16 | :size/s-14
+    :size          :size-32 | :size-24 | :size-20 | :size-16 | :size-14
     :number        number of items in the list (optional)
     :blur?         overflow-label blur?}
    items           preview list items (only 4 items is required for preview)
   "
   [{:keys [type size number blur?]} items]
-  (let [size-key    (if (contains? properties/sizes size) size :size/s-24)
+  (let [size-key    (if (contains? properties/sizes size) size :size-24)
         number      (or number (count items))
         border-type (properties/border-type type)
         margin-left (get-in properties/sizes [size-key :margin-left])]
