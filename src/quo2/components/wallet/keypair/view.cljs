@@ -59,7 +59,7 @@
           :accessibility-label :options-button}]])]))
 
 (defn details-view
-  [details stored blur? theme]
+  [{:keys [details stored blur? theme]}]
   (let [{:keys [address]} details]
     [rn/view
      {:style {:flex-direction :row
@@ -91,7 +91,7 @@
         [rn/view
          {:style {:margin-left 8
                   :flex        1}}
-         [title-view (merge props {:selected? @selected?})]
+         [title-view (assoc props :selected? @selected?)]
          [details-view props]]]
        [rn/flat-list
         {:data      accounts
