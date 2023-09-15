@@ -5,13 +5,15 @@
 
 (def descriptor
   [{:key :action :type :select :options [{:key :none} {:key :icon}]}
-   {:key :blur? :type :boolean}])
+   {:key :blur? :type :boolean}
+   (preview/customization-color-option)])
 
 (defn view
   []
-  (let [state (reagent/atom {:type    :default
-                             :title   "New House"
-                             :address "0x21a43243243242349e"})]
+  (let [state (reagent/atom {:type                :default
+                             :customization-color :blue
+                             :title               "New House"
+                             :address             "0x21a43243243242349e"})]
     (fn [] [preview/preview-container
             {:state                 state
              :descriptor            descriptor

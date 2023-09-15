@@ -4,16 +4,18 @@
             [quo2.foundations.colors :as colors]
             [quo2.theme :as quo.theme]
             [react-native.core :as rn]
-            [quo2.components.list-items.account-list-card.style :as style]
+            [quo2.components.list-items.account.style :as style]
             [reagent.core :as reagent]))
 
 (defn- internal-view
   []
   (let [state (reagent/atom :default)]
-    (fn [{:keys [blur? account-props token-props balance-props on-press on-options-press
+    (fn [{:keys [blur? account-props customization-color token-props balance-props on-press
+                 on-options-press
                  theme]}]
       [rn/pressable
-       {:style               (style/container {:state @state :blur? blur? :theme theme})
+       {:style               (style/container
+                              {:state @state :blur? blur? :customization-color customization-color})
         :on-press-in         #(reset! state :pressed)
         :on-press-out        #(reset! state :default)
         :on-press            on-press
