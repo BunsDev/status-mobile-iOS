@@ -1,8 +1,10 @@
-(ns quo2.components.buttons.button.style)
+(ns quo2.components.buttons.button.style 
+  (:require [quo.platform :as platform]))
 
-(def blur-view
+(defn blur-view [size]
   {:position :absolute
-   :top      0
+   :height   (if platform/android? size :auto)
+   :top      (if platform/android? size 0)
    :left     0
    :right    0
    :bottom   0})

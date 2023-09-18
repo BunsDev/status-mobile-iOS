@@ -82,7 +82,7 @@
               {:blur-radius   20
                :blur-type     blur-type
                :overlay-color blur-overlay-color
-               :style         style/blur-view}])
+               :style         (style/blur-view size)}])
            (when icon-top
              [rn/view
               [quo2.icons/icon icon-top
