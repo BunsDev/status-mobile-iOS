@@ -72,7 +72,7 @@
          (cond-> {:margin-top 44
                   :type       :no-title
                   :background (if (= 1 (reanimated/get-shared-value opacity-animation))
-                                :blur
+                                :white
                                 :photo)
                   :right-side page-nav-right-side}
            navigate-back? (assoc :icon-name :i/close
