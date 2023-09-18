@@ -125,6 +125,7 @@
     quo2.components.wallet.network-amount.view
     quo2.components.wallet.network-bridge.view
     quo2.components.wallet.network-link.view
+    quo2.components.wallet.network-routing.view
     quo2.components.wallet.progress-bar.view
     quo2.components.wallet.summary-info.view
     quo2.components.wallet.token-input.view
@@ -349,3 +350,4 @@
 (def wallet-overview quo2.components.wallet.wallet-overview.view/view)
 (def wallet-activity quo2.components.wallet.wallet-activity.view/view)
 (def transaction-summary quo2.components.wallet.transaction-summary.view/view)
+(def network-routing quo2.components.wallet.network-routing.view/view)
