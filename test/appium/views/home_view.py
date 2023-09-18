@@ -36,7 +36,7 @@ class ChatElement(SilentButton):
         if self.community_channel:
             super().__init__(
                 driver,
-                xpath="//*[@content-desc='chat-name-text']//*[starts-with(@text,'# %s')]/.." % username_part)
+                xpath="//*[@content-desc='channel-list-item']//*[starts-with(@text,'# %s')]/.." % username_part)
         elif community:
             super().__init__(
                 driver,
@@ -112,14 +112,6 @@ class ChatElement(SilentButton):
                 super().__init__(driver, xpath="%s/*[@content-desc='unviewed-messages-public']" % parent_locator)
 
         return UnreadMessagesPublicChat(self.driver, self.locator)
-
-    # @property
-    # def new_messages_community(self):
-    #     class UnreadMessagesCommunity(BaseElement):
-    #         def __init__(self, driver, parent_locator: str):
-    #             super().__init__(driver, prefix=parent_locator, xpath="%s/android.view.ViewGroup" % parent_locator)
-    #
-    #     return UnreadMessagesCommunity(self.driver, self.locator)
 
     @property
     def chat_image(self):
@@ -367,21 +359,23 @@ class HomeView(BaseView):
         if self.toast_content_element.is_element_displayed(10):
             self.toast_content_element.wait_for_invisibility_of_element()
         if self.notifications_unread_badge.is_element_displayed(30):
-            self.open_activity_center_button.click()
+            self.open_activity_center_button.click_until_presence_of_element(self.close_activity_centre)
         chat_element = ActivityCenterElement(self.driver, username[:25])
-        if action == 'accept':
-            self.driver.info("Accepting incoming CR for %s" % username)
-            chat_element.accept_contact_request()
-        elif action == 'decline':
-            self.driver.info("Rejecting incoming CR for %s" % username)
-            chat_element.decline_contact_request()
-        elif action == 'cancel':
-            self.driver.info("Canceling outgoing CR for %s" % username)
-            chat_element.cancel_contact_request()
-        else:
-            self.driver.fail("Illegal option for CR!")
-        self.close_activity_centre.wait_for_rendering_ended_and_click()
-        self.chats_tab.wait_for_visibility_of_element()
+        try:
+            if action == 'accept':
+                self.driver.info("Accepting incoming CR for %s" % username)
+                chat_element.accept_contact_request()
+            elif action == 'decline':
+                self.driver.info("Rejecting incoming CR for %s" % username)
+                chat_element.decline_contact_request()
+            elif action == 'cancel':
+                self.driver.info("Canceling outgoing CR for %s" % username)
+                chat_element.cancel_contact_request()
+            else:
+                self.driver.fail("Illegal option for CR!")
+        finally:
+            self.close_activity_centre.wait_for_rendering_ended_and_click()
+            self.chats_tab.wait_for_visibility_of_element()
 
     def get_username_below_start_new_chat_button(self, username_part):
         return Text(self.driver,
@@ -411,7 +405,9 @@ class HomeView(BaseView):
         self.new_chat_button.click()
         chat = self.get_chat_view()
         self.start_a_new_chat_bottom_sheet_button.click()
-        [chat.get_username_checkbox(user_name).click() for user_name in user_names_to_add]
+        for user_name in user_names_to_add:
+            chat.get_username_checkbox(user_name).click_until_presence_of_element(
+                chat.get_username_checkbox(user_name, state_on=True))
         self.setup_chat_button.click()
         chat.chat_name_editbox.send_keys(group_chat_name)
         chat.create_button.click()
@@ -437,8 +433,8 @@ class HomeView(BaseView):
         self.driver.info("## Creating community '%s', set image is set to '%s'" % (name, str(set_image)), device=False)
         self.plus_community_button.click()
         chat_view = self.communities_button.click()
-        chat_view.community_name_edit_box.set_value(name)
-        chat_view.community_description_edit_box.set_value(description)
+        chat_view.community_name_edit_box.send_keys(name)
+        chat_view.community_description_edit_box.send_keys(description)
         if set_image:
             from views.profile_view import ProfileView
             set_picture_view = ProfileView(self.driver)
@@ -474,7 +470,7 @@ class HomeView(BaseView):
         chat_view = self.communities_button.click()
         chat_view.chat_options.click()
         chat_view.element_by_translation_id("import-community").wait_and_click()
-        EditBox(self.driver, xpath="//android.widget.EditText").set_value(key)
+        EditBox(self.driver, xpath="//android.widget.EditText").send_keys(key)
         import_button.click_until_absense_of_element(import_button)
 
     def join_public_chat(self, chat_name: str):

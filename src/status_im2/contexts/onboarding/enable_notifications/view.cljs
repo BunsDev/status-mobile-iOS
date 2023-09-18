@@ -12,11 +12,10 @@
 (defn page-title
   []
   [quo/text-combinations
-   {:container-style                 {:margin-top 12}
+   {:container-style                 {:margin-top 12 :margin-horizontal 20}
     :title                           (i18n/label :t/intro-wizard-title6)
     :title-accessibility-label       :notifications-title
-    :description                     :description
-    :description-props               (i18n/label :t/enable-notifications-sub-title)
+    :description                     (i18n/label :t/enable-notifications-sub-title)
     :description-accessibility-label :notifications-sub-title}])
 
 (defn enable-notification-buttons
@@ -52,7 +51,7 @@
      [quo/page-nav
       {:background :blur
        :icon-name  :i/arrow-left
-       :on-press   #(rf/dispatch [:navigate-back-within-stack :identifiers])}]
+       :on-press   #(rf/dispatch [:navigate-back-within-stack :new-to-status])}]
      [page-title]
      [rn/view {:style style/page-illustration}
       [quo/text

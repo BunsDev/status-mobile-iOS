@@ -67,15 +67,3 @@
                   :on-success
                   ;;NOTE: returns a timestamp in s and we want ms
                   #(cb (* (js/Number (native-module/hex-to-number %)) 1000))}))
-
-(defn register-prepare-tx
-  [chain-id from ens-name pubkey cb]
-  (json-rpc/call {:method     "ens_registerPrepareTx"
-                  :params     [chain-id {:from from} ens-name pubkey]
-                  :on-success cb}))
-
-(defn set-pub-key-prepare-tx
-  [chain-id from ens-name pubkey cb]
-  (json-rpc/call {:method     "ens_setPubKeyPrepareTx"
-                  :params     [chain-id {:from from} ens-name pubkey]
-                  :on-success cb}))

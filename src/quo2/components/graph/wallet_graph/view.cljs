@@ -6,9 +6,9 @@
             [quo2.components.graph.wallet-graph.style :as style]
             [quo2.foundations.colors :as colors]
             [quo2.components.markdown.text :as text]
-            [quo2.components.graph.wallet-graph.utils :as utils]))
+            [quo2.components.graph.utils :as utils]))
 
-(defn- max-data-points
+(defn- time-frame->max-data-points
   [time-frame]
   (case time-frame
     :empty    0
@@ -18,17 +18,26 @@
     :1-year   365
     500))
 
+(defn- get-line-color
+  [customization-color state theme]
+  (let [color-keyword (cond
+                        customization-color customization-color
+                        (= state :positive) :success
+                        :else               :danger)]
+    (colors/theme-colors
+     (colors/custom-color color-keyword 50)
+     (colors/custom-color color-keyword 60)
+     theme)))
+
 (defn- view-internal
-  [{:keys [data state time-frame theme]}]
-  (let [max-data-points (max-data-points time-frame)
+  [{:keys [data state time-frame customization-color theme]}]
+  (let [max-data-points (time-frame->max-data-points time-frame)
         data            (if (and (not= time-frame :empty) (> (count data) max-data-points))
                           (utils/downsample-data data max-data-points)
                           data)
         max-value       (when-not (= time-frame :empty) (utils/find-highest-value data))
         width           (:width (rn/get-window))
-        line-color      (if (= state :positive)
-                          (colors/theme-colors colors/success-50 colors/success-60 theme)
-                          (colors/theme-colors colors/danger-50 colors/danger-60 theme))
+        line-color      (get-line-color customization-color state theme)
         gradient-colors [(colors/alpha line-color 0.1) (colors/alpha line-color 0)]
         fill-color      (colors/theme-colors colors/white colors/neutral-95)]
     (if (= time-frame :empty)

@@ -76,7 +76,7 @@
 
 (defn header
   [{:keys [in-progress?] :as sign}
-   {:keys [contact amount approve? cancel? hash]}
+   {:keys [contact amount approve? cancel?] :as tx}
    display-symbol fee fee-display-symbol]
   [react/view styles/header
    (when sign
@@ -94,14 +94,14 @@
                   :else
                   (i18n/label :t/sending))
             (if cancel?
-              (str " " (utils/get-shortened-address hash))
+              (str " " (utils/get-shortened-address (:hash tx)))
               (str " " amount " " display-symbol)))]
       [react/text {:style {:typography :title-bold}} (i18n/label :t/contract-interaction)])
     (if sign
       [react/nested-text
        {:style           {:color colors/gray}
         :ellipsize-mode  :middle
-        :number-of-lines 1} (i18n/label :t/to) " "
+        :number-of-lines 1} (i18n/label :t/to-capitalized) " "
        [{:style {:color colors/black}} (displayed-name contact)]]
       [react/text {:style {:margin-top 6 :color colors/gray}}
        (str fee " " fee-display-symbol " " (string/lower-case (i18n/label :t/network-fee)))])]
@@ -497,9 +497,9 @@
             [react/view
              [network-item]
              [separator]])
-          [contact-item (i18n/label :t/from) from]
+          [contact-item (i18n/label :t/from-capitalized) from]
           [separator]
-          [contact-item (i18n/label :t/to) contact]
+          [contact-item (i18n/label :t/to-capitalized) contact]
           (when-not cancel?
             [separator])
           (when-not cancel?

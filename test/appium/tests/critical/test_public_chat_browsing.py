@@ -133,7 +133,7 @@ class TestPublicChatBrowserOneDeviceMerged(MultipleSharedDeviceTestCase):
 
     @marks.testrail_id(700739)
     def test_public_chat_open_using_deep_link(self):
-        self.drivers[0].close_app()
+        self.drivers[0].terminate_app(self.drivers[0].current_package)
         chat_name = self.home.get_random_chat_name()
         deep_link = 'status-im://%s' % chat_name
         self.sign_in.open_weblink_and_login(deep_link)
@@ -322,6 +322,7 @@ class TestCommunityOneDeviceMerged(MultipleSharedDeviceTestCase):
         self.channel = self.community_view.get_channel(self.channel_name).click()
 
     @marks.testrail_id(703503)
+    @marks.xfail(reason="https://github.com/status-im/status-mobile/issues/17175", run=False)
     def test_community_discovery(self):
         self.home.navigate_back_to_home_view()
         self.home.communities_tab.click()
@@ -337,7 +338,7 @@ class TestCommunityOneDeviceMerged(MultipleSharedDeviceTestCase):
         for element, template in element_templates.items():
             if element.is_element_differs_from_template(template):
                 element.save_new_screenshot_of_element('%s_different.png' % element.name)
-                self.errors.append("%s is different from expected %s!" % (element.name, template))
+                self.errors.append("Element %s is different from expected template %s!" % (element.locator, template))
         self.errors.verify_no_errors()
 
     @marks.testrail_id(702846)
@@ -348,6 +349,7 @@ class TestCommunityOneDeviceMerged(MultipleSharedDeviceTestCase):
             self.home.get_to_community_channel_from_home(self.community_name)
 
         self.channel.send_message(text_message)
+        self.channel.chat_element_by_text(text_message).wait_for_visibility_of_element()
         self.channel.reopen_app()
         if not self.channel.chat_element_by_text(text_message).is_element_displayed(30):
             self.drivers[0].fail("Not navigated to channel view after reopening app")
@@ -577,6 +579,7 @@ class TestCommunityMultipleDeviceMerged(MultipleSharedDeviceTestCase):
         self.chat_2.chat_element_by_text(self.community_name).view_community_button.click()
         self.community_2.join_community()
         self.channel_2 = self.community_2.get_channel(self.channel_name).click()
+        self.channel_2.chat_message_input.wait_for_visibility_of_element(20)
 
     @marks.testrail_id(702838)
     def test_community_message_send_check_timestamps_sender_username(self):
@@ -828,7 +831,7 @@ class TestCommunityMultipleDeviceMerged(MultipleSharedDeviceTestCase):
         for key, data in preview_urls.items():
             self.home_2.just_fyi("Checking %s preview case" % key)
             url = data['url']
-            self.channel_2.chat_message_input.set_value(url)
+            self.channel_2.chat_message_input.send_keys(url)
             self.channel_2.url_preview_composer.wait_for_element(20)
             shown_title = self.channel_2.url_preview_composer_text.text
             if shown_title != data['title']:
@@ -887,6 +890,7 @@ class TestCommunityMultipleDeviceMerged(MultipleSharedDeviceTestCase):
         channel_1_element.click()
         self.errors.verify_no_errors()
 
+    @marks.xfail(reason="Message can be missed after unblock: https://github.com/status-im/status-mobile/issues/16873")
     @marks.testrail_id(702894)
     def test_community_contact_block_unblock_offline(self):
         for i, channel in enumerate([self.channel_1, self.channel_2]):
@@ -909,6 +913,7 @@ class TestCommunityMultipleDeviceMerged(MultipleSharedDeviceTestCase):
         self.channel_1.block_contact()
 
         self.chat_1.just_fyi('Check that messages from blocked user are hidden in public chat and close app')
+        app_package = self.device_1.driver.current_package
         if not self.chat_1.chat_element_by_text(message_to_disappear).is_element_disappeared(30):
             self.errors.append("Messages from blocked user is not cleared in public chat ")
         self.chat_1.navigate_back_to_home_view()
@@ -920,7 +925,7 @@ class TestCommunityMultipleDeviceMerged(MultipleSharedDeviceTestCase):
         # workaround for app closed after airplane mode
         if not self.home_1.chats_tab.is_element_displayed() and \
                 not self.chat_1.chat_floating_screen.is_element_displayed():
-            self.device_1.driver.launch_app()
+            self.device_1.driver.activate_app(app_package)
             self.device_1.sign_in()
 
         self.home_2.just_fyi('Send message to public chat while device 1 is offline')
@@ -1010,6 +1015,7 @@ class TestCommunityMultipleDeviceMerged(MultipleSharedDeviceTestCase):
             self.errors.append("New messages counter is not shown in community channel element")
         self.community_1.click_system_back_button()
         mark_as_read_button = self.community_1.mark_all_messages_as_read_button
+        self.home_1.community_floating_screen.wait_for_invisibility_of_element()
         community_1_element.long_press_until_element_is_shown(mark_as_read_button)
         mark_as_read_button.click()
         if community_1_element.new_messages_grey_dot.is_element_displayed():
@@ -1020,6 +1026,7 @@ class TestCommunityMultipleDeviceMerged(MultipleSharedDeviceTestCase):
             self.errors.append(
                 "New messages badge is shown in community channel element while there are no unread messages")
         self.errors.verify_no_errors()
+
 
 @pytest.mark.xdist_group(name="new_five_2")
 @marks.new_ui_critical
@@ -1065,10 +1072,10 @@ class TestCommunityMultipleDeviceMergedTwo(MultipleSharedDeviceTestCase):
         self.channel_2 = self.community_2.get_channel(self.channel_name).click()
 
     @marks.testrail_id(702786)
-    @marks.xfail(
-        reason="Issue with username in PN, issue #6 in https://github.com/status-im/status-mobile/issues/15500")
+    @marks.xfail(reason="Issue with username in PN, issue #6 in 15500")
     def test_community_mentions_push_notification(self):
         self.home_1.navigate_back_to_home_view()
+        self.device_1.open_notification_bar()
 
         self.device_2.just_fyi("Invited member sends a message with a mention")
         self.channel_2.send_message("hi")
@@ -1076,7 +1083,6 @@ class TestCommunityMultipleDeviceMergedTwo(MultipleSharedDeviceTestCase):
         self.channel_2.send_message_button.click()
 
         self.device_1.just_fyi("Admin gets push notification with the mention and tap it")
-        self.device_1.open_notification_bar()
         message_received = False
         if self.home_1.get_pn(self.username_1):
             self.device_1.click_upon_push_notification_by_text(self.username_1)
@@ -1224,7 +1230,7 @@ class TestCommunityMultipleDeviceMergedTwo(MultipleSharedDeviceTestCase):
         control_message_1_1_chat = "it is just a message text"
         self.chat_2.send_message(control_message_1_1_chat)
         self.chat_2.chat_element_by_text(community_name).view_community_button.click()
-        self.community_2.join_community()
+        self.community_2.join_community(open_community=False)
 
         self.home_1.just_fyi("Device 1 accepts the community request")
         self.home_1.jump_to_communities_home()

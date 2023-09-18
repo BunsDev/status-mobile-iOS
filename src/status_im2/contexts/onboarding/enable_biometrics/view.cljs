@@ -13,11 +13,10 @@
 (defn page-title
   []
   [quo/text-combinations
-   {:container-style                 {:margin-top 12}
+   {:container-style                 {:margin-top 12 :margin-horizontal 20}
     :title                           (i18n/label :t/enable-biometrics)
     :title-accessibility-label       :enable-biometrics-title
-    :description                     :description
-    :description-props               (i18n/label :t/use-biometrics)
+    :description                     (i18n/label :t/use-biometrics)
     :description-accessibility-label :enable-biometrics-sub-title}])
 
 (defn enable-biometrics-buttons
@@ -43,31 +42,23 @@
 (defn enable-biometrics-parallax
   []
   (let [stretch (if rn/small-screen? 25 40)]
-    [:<>
-     [parallax/video
-      {:layers  (:biometrics resources/parallax-video)
-       :stretch stretch}]
-     [rn/view
-      [quo/page-nav {:background :blur}]
-      [page-title]]]))
+    [parallax/video
+     {:layers  (:biometrics resources/parallax-video)
+      :stretch stretch}]))
 
 (defn enable-biometrics-simple
   []
   (let [width (:width (rn/get-window))]
-    [:<>
-     [rn/view {:flex 1}
-      [quo/page-nav {:background :blur}]
-      [page-title]
-      [rn/view {:style {:flex 1}}
-       [rn/image
-        {:resize-mode :contain
-         :style       (style/page-illustration width)
-         :source      (resources/get-image :biometrics)}]]]]))
+    [rn/image
+     {:resize-mode :contain
+      :style       (style/page-illustration width)
+      :source      (resources/get-image :biometrics)}]))
 
 (defn enable-biometrics
   []
   (let [insets (safe-area/get-insets)]
     [rn/view {:style (style/page-container insets)}
+     [page-title]
      (if whitelist/whitelisted?
        [enable-biometrics-parallax]
        [enable-biometrics-simple])

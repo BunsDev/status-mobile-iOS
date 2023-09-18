@@ -186,7 +186,9 @@ class TestActivityMultipleDevicePR(MultipleSharedDeviceTestCase):
         self.community_1.element_by_translation_id("community-channel").click()
         if not self.channel_1.chat_element_by_text(self.text_message).is_element_displayed(20):
             self.errors.append("User was not redirected to community channel after tapping on community channel card!")
+        element = self.channel_1.jump_to_button.find_element()
         self.channel_1.click_system_back_button()
+        self.channel_1.wait_for_staleness_of_element(element)
         self.community_1.jump_to_button.click()
         self.community_1.element_by_text_part(self.username_2).click()
         if not self.chat_1.chat_element_by_text(self.one_to_one_message).is_element_displayed(20):
@@ -321,14 +323,10 @@ class TestActivityMultipleDevicePRTwo(MultipleSharedDeviceTestCase):
         self.chat_2.chat_element_by_text(self.community_name).view_community_button.click()
         self.community_2.join_community()
         self.channel_2 = self.community_2.get_channel(self.channel_name).click()
+        self.channel_2.chat_message_input.wait_for_visibility_of_element(20)
 
     @marks.testrail_id(702957)
     def test_activity_center_mentions(self):
-        if not self.channel_2.chat_message_input.is_element_displayed():
-            self.channel_2.navigate_back_to_home_view()
-            self.home_2.communities_tab.click()
-            self.home_2.get_chat(self.community_name, community=True).click()
-            self.home_2.get_chat(self.channel_name, community_channel=True).click()
         self.home_1.navigate_back_to_home_view()
         self.home_1.communities_tab.click()
 
@@ -384,7 +382,7 @@ class TestActivityMultipleDevicePRTwo(MultipleSharedDeviceTestCase):
         self.home_2.chats_tab.click()
         self.chat_2 = self.home_2.get_chat(self.username_1).click()
         self.chat_2.chat_element_by_text(community_name).view_community_button.wait_and_click(sec=60)
-        self.community_2.join_community()
+        self.community_2.join_community(open_community=False)
         for home in self.home_1, self.home_2:
             home.navigate_back_to_home_view()
             home.communities_tab.click()

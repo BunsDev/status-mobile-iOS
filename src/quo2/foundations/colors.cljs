@@ -123,6 +123,7 @@
 
 ;;;;Blur
 (def white-70-blur (alpha white 0.7))
+(def white-70-blur-opaque (alpha-opaque white 0.7))
 (def neutral-80-opa-1-blur (alpha "#192438" 0.1))
 (def neutral-5-opa-70-blur (alpha neutral-5 0.7))
 (def neutral-10-opa-10-blur (alpha neutral-10 0.1))
@@ -221,6 +222,18 @@
    :magenta   {50 "#EC266C"
                60 "#BD1E56"}})
 
+;;;; Networks
+
+(def networks
+  {:ethereum "#758EEB"
+   :optimism "#E76E6E"
+   :arbitrum "#6BD5F0"
+   :zkSync   "#9FA0FE"
+   :hermez   "#EB8462"
+   :xDai     "#3FC0BD"
+   :polygon  "#AD71F3"
+   :unknown  "#EEF2F5"})
+
 (def colors-map
   (merge {:primary {50 primary-50 ;; User can also use primary color as customisation color
                     60 primary-60}
@@ -240,7 +253,12 @@
                     60 danger-60}
           :success {50 success-50
                     60 success-60}}
-         customization))
+         customization
+         networks))
+
+(defn hex-string?
+  [s]
+  (and (string? s) (string/starts-with? s "#")))
 
 (def custom-color
   "(custom-color color suffix opacity)
@@ -249,16 +267,20 @@
    opacity 0-100 (optional)"
   (memoize
    (fn
+     ([color]
+      (custom-color color nil nil))
      ([color suffix]
       (custom-color color suffix nil))
      ([color suffix opacity]
-      (let [hex?          (not (keyword? color))
-            color-keyword (keyword color)
-            base-color    (get-in colors-map
-                                  [color-keyword suffix])]
-        (if hex?
-          color
-          (if opacity (alpha base-color (/ opacity 100)) base-color)))))))
+      (let [hex?  (not (keyword? color))
+            color (if (hex-string? (get colors-map color))
+                    (get colors-map color)
+                    (get-in colors-map [color suffix]))]
+        (cond
+          (and opacity hex?) (alpha color (/ opacity 100))
+          opacity            (alpha color (/ opacity 100))
+          hex?               color
+          :else              color))))))
 
 (defn custom-color-by-theme
   "(custom-color-by-theme color suffix-light suffix-dark opacity-light opacity-dark)
@@ -296,15 +318,3 @@
 (defn dark?
   []
   (theme/dark?))
-
-;;;; Networks
-
-(def networks
-  {:ethereum "#758EEB"
-   :optimism "#E76E6E"
-   :arbitrum "#6BD5F0"
-   :zkSync   "#9FA0FE"
-   :hermez   "#EB8462"
-   :xDai     "#3FC0BD"
-   :polygon  "#AD71F3"
-   :unknown  "#EEF2F5"})

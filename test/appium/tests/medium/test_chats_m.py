@@ -147,16 +147,16 @@ class TestTimelineHistoryNodesBootnodesMultipleDeviceMergedMedium(MultipleShared
         self.profile_1.advanced_button.click()
         self.profile_1.bootnodes_button.click()
         self.profile_1.add_bootnode_button.click()
-        self.profile_1.specify_name_input.set_value('test')
+        self.profile_1.specify_name_input.send_keys('test')
         # TODO: blocked as validation is missing for bootnodes (rechecked 04.10.22, valid)
-        # profile_1.bootnode_address_input.set_value('invalid_bootnode_address')
+        # profile_1.bootnode_address_input.send_keys('invalid_bootnode_address')
         # if not profile_1.element_by_text_part('Invalid format').is_element_displayed():
         #      self.errors.append('Validation message about invalid format of bootnode is not shown')
         # profile_1.save_button.click()
         # if profile_1.add_bootnode_button.is_element_displayed():
         #      self.errors.append('User was navigated to another screen when tapped on disabled "Save" button')
         # profile_1.bootnode_address_input.clear()
-        self.profile_1.bootnode_address_input.set_value(bootnode_address)
+        self.profile_1.bootnode_address_input.send_keys(bootnode_address)
         self.profile_1.save_button.click()
         self.profile_1.enable_bootnodes.click()
         self.profile_1.home_button.double_click()
@@ -237,8 +237,8 @@ class TestTimelineHistoryNodesBootnodesMultipleDeviceMergedMedium(MultipleShared
         self.profile_1.mail_server_auto_selection_button.click()
         self.profile_1.plus_button.click()
         server_name = 'a_test'
-        self.profile_1.specify_name_input.set_value(server_name)
-        self.profile_1.mail_server_address_input.set_value('%s%s' % (mailserver_address[:-3], '553'))
+        self.profile_1.specify_name_input.send_keys(server_name)
+        self.profile_1.mail_server_address_input.send_keys('%s%s' % (mailserver_address[:-3], '553'))
         self.profile_1.save_button.click()
         self.profile_1.mail_server_by_name(server_name).click()
         self.profile_1.mail_server_connect_button.wait_and_click()
@@ -890,7 +890,7 @@ class TestChatKeycardMentionsMediumMultipleDevice(MultipleSharedDeviceTestCase):
         self.home_1.just_fyi('Request %s STT in 1-1 chat and check it is visible for sender and receiver' % self.amount)
         self.chat_1.commands_button.click()
         request_transaction = self.chat_1.request_command.click()
-        request_transaction.amount_edit_box.set_value(self.amount)
+        request_transaction.amount_edit_box.send_keys(self.amount)
         request_transaction.confirm()
         asset_button = request_transaction.asset_by_name(self.asset_name)
         request_transaction.select_asset_button.click_until_presence_of_element(asset_button)
@@ -940,6 +940,7 @@ class TestChatKeycardMentionsMediumMultipleDevice(MultipleSharedDeviceTestCase):
 
     @marks.testrail_id(702296)
     def test_block_user_from_1_1_chat_header_check_mentions_and_push_notification_service(self):
+        app_package = self.device_1.driver.current_package
         [home.home_button.double_click() for home in (self.home_1, self.home_2)]
         message_before_block_1 = "Before block from recipient"
         message_before_block_2 = "Before block from sender"
@@ -1000,7 +1001,7 @@ class TestChatKeycardMentionsMediumMultipleDevice(MultipleSharedDeviceTestCase):
 
         self.device_1.just_fyi("reopen app and check that messages from blocked user are not fetched")
         self.device_1.click_system_home_button()
-        self.device_1.driver.launch_app()
+        self.device_1.driver.activate_app(app_package)
         self.device_1.sign_in(keycard=True)
         if blocked_chat_user.is_element_displayed():
             self.errors.append("Chat with blocked user is reappeared after fetching new messages from offline")

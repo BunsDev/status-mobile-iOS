@@ -47,21 +47,31 @@
   (oops/oget event "nativeEvent.layout.y"))
 
 (defn- channel-chat-item
-  [community-id community-color {:keys [:muted? id] :as chat}]
+  [community-id community-color
+   {:keys [name emoji muted? id mentions-count unread-messages? on-press locked?] :as chat}]
   (let [sheet-content      [actions/chat-actions
                             (assoc chat
                                    :chat-type constants/community-chat-type
                                    :chat-id   (str community-id id))
                             false]
-        channel-sheet-data {:selected-item (fn [] [quo/channel-list-item chat])
+        notification       (cond
+                             muted?               :mute
+                             (> mentions-count 0) :mention
+                             unread-messages?     :notification
+                             :else                nil)
+        channel-options    {:name                name
+                            :emoji               emoji
+                            :customization-color community-color
+                            :mentions-count      mentions-count
+                            :locked?             locked?
+                            :notification        notification}
+        channel-sheet-data {:selected-item (fn [] [quo/channel channel-options])
                             :content       (fn [] sheet-content)}]
-    [rn/view {:key id :style {:margin-top 4}}
-     [quo/channel-list-item
-      (assoc chat
-             :default-color community-color
-             :on-long-press #(rf/dispatch [:show-bottom-sheet channel-sheet-data])
-             :muted?        (or muted?
-                                (rf/sub [:chat/check-channel-muted? community-id id])))]]))
+    [rn/view {:key id}
+     [quo/channel
+      (merge channel-options
+             {:on-press      on-press
+              :on-long-press #(rf/dispatch [:show-bottom-sheet channel-sheet-data])})]]))
 
 (defn channel-list-component
   [{:keys [on-category-layout community-id community-color on-first-channel-height-changed]}
@@ -88,12 +98,6 @@
          (into [rn/view {:style {:padding-horizontal 8 :padding-bottom 8}}]
                (map #(channel-chat-item community-id community-color %))
                chats))]))])
-
-(defn request-to-join-text
-  [is-open?]
-  (if is-open?
-    (i18n/label :t/join-open-community)
-    (i18n/label :t/request-to-join-community)))
 
 (defn get-access-type
   [access]
@@ -163,13 +167,11 @@
         (i18n/label :t/join-open-community)]])))
 
 (defn join-community
-  [{:keys [joined can-join? color permissions token-permissions] :as community}
+  [{:keys [joined color permissions token-permissions] :as community}
    pending?]
   (let [access-type     (get-access-type (:access permissions))
         unknown-access? (= access-type :unknown-access)
-        invite-only?    (= access-type :invite-only)
-        is-open?        (= access-type :open)
-        node-offline?   (and can-join? (not joined) pending?)]
+        invite-only?    (= access-type :invite-only)]
     [:<>
      (when-not (or joined pending? invite-only? unknown-access?)
        (if (seq token-permissions)
@@ -179,20 +181,14 @@
            :accessibility-label :show-request-to-join-screen-button
            :customization-color color
            :icon-left           :i/communities}
-          (request-to-join-text is-open?)]))
+          (i18n/label :t/request-to-join-community)]))
 
-     (when (and (not (or joined pending? token-permissions)) (not (or is-open? node-offline?)))
+     (when (not (or joined pending? token-permissions))
        [quo/text
-        {:size  :paragraph-2
-         :style style/review-notice}
-        (i18n/label :t/community-admins-will-review-your-request)])
-
-     (when node-offline?
-       [quo/information-box
-        {:type  :informative
-         :icon  :i/info
-         :style {:margin-top 12}}
-        (i18n/label :t/request-processed-after-node-online)])]))
+        {:size   :paragraph-2
+         :weight :regular
+         :style  style/review-notice}
+        (i18n/label :t/community-admins-will-review-your-request)])]))
 
 (defn status-tag
   [pending? joined]
@@ -232,33 +228,22 @@
            [category (update v :chats add-on-press)])
          categorized-chats)))
 
-
 (defn community-header
-  [title logo]
+  [title logo description]
   [quo/text-combinations
    {:container-style
-    {:margin-horizontal 0
-     :padding-right 20
-     :margin-top
+    {:margin-top
      (if logo
        12
        (+ scroll-page.style/picture-radius
           scroll-page.style/picture-border-width
-          12))}
+          12))
+     :margin-bottom 12}
     :avatar logo
     :title title
-    :title-accessibility-label :chat-name-text}])
-
-(defn community-description
-  [description]
-  [quo/text
-   {:accessibility-label :community-description-text
-    :number-of-lines     4
-    :ellipsize-mode      :tail
-    :weight              :regular
-    :size                :paragraph-1
-    :style               {:margin-top 8 :margin-bottom 12}}
-   description])
+    :description description
+    :title-accessibility-label :community-title
+    :description-accessibility-label :community-description}])
 
 (defn community-content
   [{:keys [name description joined images tags color id]
@@ -272,9 +257,8 @@
      [rn/view {:style style/community-content-container}
       (when-not collapsed?
         [status-tag pending? joined])
-      [community-header name (when collapsed? (get-in images [:thumbnail :uri]))]
-      (when-not collapsed?
-        [community-description description])
+      [community-header name (when collapsed? (get-in images [:thumbnail :uri]))
+       (when-not collapsed? description)]
       (when-not collapsed?
         [quo/community-tags
          {:tags            tags

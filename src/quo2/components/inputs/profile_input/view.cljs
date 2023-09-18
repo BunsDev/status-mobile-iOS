@@ -31,10 +31,11 @@
                  :borderRadius 12}]}
        [user-avatar/user-avatar
         (assoc image-picker-props
-               :static?           true
-               :status-indicator? false
-               :full-name         (if (seq full-name) full-name placeholder)
-               :size              :medium)]]
+               :customization-color customization-color
+               :static?             true
+               :status-indicator?   false
+               :full-name           (if (seq full-name) full-name placeholder)
+               :size                :medium)]]
       [buttons/button
        {:accessibility-label :select-profile-picture-button
         :type                :grey
@@ -45,7 +46,7 @@
         :container-style     style/button
         :inner-style         style/button-inner} :i/camera]]
      [rn/view {:style style/input-container}
-      [title-input/title-input
+      [title-input/view
        (merge title-input-props
               {:blur?               true
                :placeholder         placeholder

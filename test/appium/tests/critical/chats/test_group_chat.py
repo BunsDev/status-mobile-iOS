@@ -211,11 +211,11 @@ class TestGroupChatMultipleDeviceMergedNewUI(MultipleSharedDeviceTestCase):
         message_to_admin = self.message_to_admin
         [self.homes[i].navigate_back_to_home_view() for i in range(3)]
         self.homes[1].get_chat(self.chat_name).click()
+        self.chats[0].open_notification_bar()
 
         self.chats[1].send_message(message_to_admin)
 
         self.chats[0].just_fyi('Check that PN is received and after tap you are redirected to group chat')
-        self.chats[0].open_notification_bar()
         pn = self.homes[0].get_pn(message_to_admin)
         if pn:
             pn.click()
@@ -412,6 +412,7 @@ class TestGroupChatMultipleDeviceMergedNewUI(MultipleSharedDeviceTestCase):
         message_1, message_2 = 'message from old member', 'message from new member'
 
         self.homes[0].just_fyi("Put admin device to offline and send messages from members")
+        app_package = self.drivers[0].current_package
         self.homes[0].toggle_airplane_mode()
         self.chats[1].send_message(message_1)
         self.chats[2].send_message(message_2)
@@ -428,7 +429,7 @@ class TestGroupChatMultipleDeviceMergedNewUI(MultipleSharedDeviceTestCase):
         self.homes[0].click_system_back_button()
         # workaround for app closed after opening notifications
         if not self.homes[0].chats_tab.is_element_displayed():
-            self.drivers[0].launch_app()
+            self.drivers[0].activate_app(app_package)
             SignInView(self.drivers[0]).sign_in()
         self.homes[0].chats_tab.click()
         self.homes[0].get_chat(self.chat_name).click()

@@ -224,6 +224,7 @@ release-android: keystore build-android ##@build Build signed Android APK
 	@scripts/sign-android.sh result/app-release-unsigned.apk
 
 release-ios: export TARGET := ios
+release-ios: export IOS_STATUS_GO_TARGETS := ios/arm64
 release-ios: export BUILD_ENV ?= prod
 release-ios: watchman-clean ios-clean jsbundle ##@build Build release for iOS release
 	xcodebuild \
@@ -272,11 +273,14 @@ run-re-frisk: ##@run Start re-frisk server
 
 # TODO: Migrate this to a Nix recipe, much the same way as nix/mobile/android/targets/release-android.nix
 run-android: export TARGET := android
+# INFO: If it's empty (no devices attached, parsing issues, script error) - for Nix it's the same as not set.
+run-android: export ANDROID_ABI_INCLUDE ?= $(shell ./scripts/adb_devices_arch.sh)
 run-android: ##@run Build Android APK and start it on the device
 	npx react-native run-android --appIdSuffix debug
 
 SIMULATOR=iPhone 11 Pro
 run-ios: export TARGET := ios
+run-ios: export IOS_STATUS_GO_TARGETS := iossimulator/amd64
 run-ios: ##@run Build iOS app and start it in a simulator/device
 ifneq ("$(SIMULATOR)", "")
 	npx react-native run-ios --simulator="$(SIMULATOR)"
@@ -284,11 +288,11 @@ else
 	npx react-native run-ios
 endif
 
-show-ios-devices: export TARGET := ios
 show-ios-devices: ##@other shows connected ios device and its name
 	xcrun xctrace list devices
 
 run-ios-device: export TARGET := ios
+run-ios-device: export IOS_STATUS_GO_TARGETS := ios/arm64
 run-ios-device: ##@run iOS app and start it on a connected device by its name
 ifndef DEVICE_NAME
 	$(error Usage: make run-ios-device DEVICE_NAME=your-device-name)
@@ -307,7 +311,7 @@ endef
 lint: export TARGET := clojure
 lint: ##@test Run code style checks
 	@sh scripts/lint-re-frame-in-quo-components.sh && \
-	clj-kondo --config .clj-kondo/config.edn --cache false --lint src && \
+	clj-kondo --config .clj-kondo/config.edn --cache false --fail-level error --lint src && \
 	ALL_CLOJURE_FILES=$(call find_all_clojure_files) && \
 	zprint '{:search-config? true}' -sfc $$ALL_CLOJURE_FILES && \
 	sh scripts/lint-trailing-newline.sh && \
@@ -346,6 +350,11 @@ test: ##@test Run tests once in NodeJS
 	yarn shadow-cljs compile mocks && \
 	yarn shadow-cljs compile test && \
 	node --require ./test-resources/override.js target/test/test.js
+
+android-test: jsbundle
+android-test: export TARGET := android
+android-test:
+	cd android && ./gradlew test
 
 component-test-watch: export TARGET := clojure
 component-test-watch: export COMPONENT_TEST := true

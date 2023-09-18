@@ -73,18 +73,20 @@
 (defn- view-internal
   [{:keys [theme type size state blur? customization-color profile-picture full-name users
            group-name token-logo amount token-name network-logo network-name networks
-           account-name emoji collectible collectible-name collectible-number duration]
+           account-name emoji collectible collectible-name collectible-number duration container-style]
     :or   {customization-color :blue
            type                :default
            state               :default}
     :as   props}]
   [rn/view
-   {:style (style/container {:theme               theme
-                             :type                type
-                             :size                size
-                             :state               state
-                             :blur?               blur?
-                             :customization-color customization-color})}
+   {:style               (merge (style/container {:theme               theme
+                                                  :type                type
+                                                  :size                size
+                                                  :state               state
+                                                  :blur?               blur?
+                                                  :customization-color customization-color})
+                                container-style)
+    :accessibility-label :context-tag}
    (case type
      :default
      [tag-skeleton {:theme theme :size size :text full-name}
@@ -92,7 +94,8 @@
        {:full-name         full-name
         :profile-picture   profile-picture
         :size              (if (= size 24) :xxs 28)
-        :status-indicator? false}]]
+        :status-indicator? false
+        :ring?             false}]]
 
      :multiuser
      [preview-list/view {:type :user :size 20}
