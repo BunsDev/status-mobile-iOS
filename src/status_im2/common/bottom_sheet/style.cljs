@@ -46,16 +46,27 @@
    :top              0
    :bottom           0})
 
+(defn sheet-content
+  [theme padding-bottom-override insets]
+  {:position                :absolute
+   :background-color        (colors/theme-colors colors/white colors/neutral-95 theme)
+   :bottom                  0
+   :left                    0
+   :right                   0
+   :border-top-left-radius  20
+   :border-top-right-radius 20
+   :padding-bottom          (or padding-bottom-override (+ (:bottom insets) 8))})
+
 (defn selected-item
-  [theme max-height sheet-height show-bottom-margin]
+  [theme top sheet-height show-bottom-margin border-radius]
   {:position          :absolute
-   :top               (when (not show-bottom-margin) (- 0 max-height))
-   ;; Bottom margin of 8 is added when the selected item height is less than 
-   ;; or equals the max-height of the selected item
-   :bottom            (when show-bottom-margin (+ sheet-height bottom-margin))
+   :top               (when (not show-bottom-margin) (- 0 top))
+   ;; Bottom margin of 8 is added when the selected item height is less than
+   ;; the max-height of the selected item view
+   :bottom            (when show-bottom-margin (+ sheet-height 8))
    :overflow          :hidden
    :left              0
    :right             0
-   :border-radius     12
+   :border-radius     (if (= border-radius 16) 16 12)
    :margin-horizontal 8
    :background-color  (colors/theme-colors colors/white colors/neutral-90 theme)})
