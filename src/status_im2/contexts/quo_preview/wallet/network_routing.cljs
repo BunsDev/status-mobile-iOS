@@ -5,18 +5,7 @@
             [status-im2.contexts.quo-preview.preview :as preview]))
 
 (def descriptor
-  [{:label   "State:"
-    :key     :state
-    :type    :select
-    :options [{:key   :pending
-               :value "pending"}
-              {:key   :confirmed
-               :value "confirmed"}
-              {:key   :finalized
-               :value "finalized"}
-              {:key   :error
-               :value "error"}]}
-   (preview/customization-color-option)])
+  [])
 
 (defn preview
   []
@@ -24,8 +13,5 @@
                              :customization-color :blue})]
     (fn []
       [preview/preview-container {:state state :descriptor descriptor}
-       [rn/view
-        {:style {:flex        1
-                 :padding-top 40
-                 :align-items :center}}
+       [rn/view {:style {:flex 1}}
         [quo/network-routing @state]]])))
