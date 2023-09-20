@@ -27,9 +27,11 @@
         online?              (rf/sub [:visibility-status-updates/online? public-key])
         account              (rf/sub [:profile/multiaccount])
         customization-color  (rf/sub [:profile/customization-color])
+        ring?                (rf/sub [:avatar/ring?])
         avatar               {:online?         online?
                               :full-name       (multiaccounts/displayed-name account)
-                              :profile-picture (multiaccounts/displayed-photo account)}
+                              :profile-picture (multiaccounts/displayed-photo account)
+                              :ring?           ring?}
         network-type         (rf/sub [:network/type])
         unread-count         (rf/sub [:activity-center/unread-count])
         indicator            (rf/sub [:activity-center/unread-indicator])

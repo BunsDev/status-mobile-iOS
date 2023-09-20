@@ -305,3 +305,9 @@
  :<- [:profile/profile]
  (fn [multiaccount]
    (get multiaccount :link-preview-request-enabled)))
+
+(re-frame/reg-sub
+ :avatar/ring?
+ :<- [:ens/names]
+ (fn [names]
+   (empty? names)))
