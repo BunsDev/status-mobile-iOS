@@ -12,9 +12,9 @@
     [reagent.core :as reagent]))
 
 (defn- internal-view
-  [{:keys [theme customization-color status token metrics? values on-press]}]
+  []
   (let [state (reagent/atom :default)]
-    (fn []
+    (fn [{:keys [theme customization-color status token metrics? values on-press]}]
       (let [bg-opacity                                                      (case @state
                                                                               :active  10
                                                                               :pressed 5
