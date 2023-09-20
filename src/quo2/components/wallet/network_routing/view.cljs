@@ -16,11 +16,11 @@
        ;; TODO: think how to disappear the component animated
        #(reanimated/animate appearing-opacity 0 300)))
 
-    [rn/view {:style {:width            28
+    [rn/view {:style {:width            40
                       :background-color :transparent
                       :justify-content  :center
                       :align-items      :center
-                      :right            -14}}
+                      :right            -20}}
      [reanimated/view
       {:style (reanimated/apply-animations-to-style
                {:opacity appearing-opacity
@@ -104,7 +104,8 @@
             {:style {:border-left-width 1
                      :border-style      :dashed
                      :border-color      "#758EEB"
-                     :z-index -1}}])
+                     :z-index           -1
+                     :left              -1}}])
          ])
       )))
 
