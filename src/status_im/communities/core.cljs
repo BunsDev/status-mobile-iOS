@@ -6,7 +6,6 @@
             [quo2.foundations.colors :as quo2.colors]
             [re-frame.core :as re-frame]
             [status-im.utils.types :as types]
-            [status-im.async-storage.core :as async-storage]
             [status-im.ui.components.emoji-thumbnail.styles :as emoji-thumbnail-styles]
             [status-im.utils.universal-links.core :as universal-links]
             [status-im.bottom-sheet.events :as bottom-sheet]
@@ -819,13 +818,6 @@
   [public-key community-id category-id]
   (hash (str public-key community-id category-id)))
 
-(rf/defn store-category-state
-  {:events [::store-category-state]}
-  [{:keys [db]} community-id category-id state-open?]
-  (let [public-key (get-in db [:profile/profile :public-key])
-        hash       (category-hash public-key community-id category-id)]
-    {::async-storage/set! {hash state-open?}}))
-
 (rf/defn update-category-states-in-db
   {:events [::category-states-loaded]}
   [{:keys [db]} community-id hashes states]
@@ -856,9 +848,9 @@
                                               (update :keys #(conj % hash)))))
                                       {}
                                       categories)]
-    {::async-storage/get {:keys keys
-                          :cb   #(re-frame/dispatch
-                                  [::category-states-loaded community-id hashes %])}}))
+    {:async-storage-get {:keys keys
+                         :cb   #(re-frame/dispatch
+                                 [::category-states-loaded community-id hashes %])}}))
 
 ;; Note - dispatch is used to make sure we are opening community once `pop-to-root` is processed.
 ;; Don't directly merge effects using `navigation/navigate-to`, because it will work in debug and
