@@ -814,24 +814,6 @@
                     :on-success  #(re-frame/dispatch [:sanitize-messages-and-process-response %])
                     :on-error    #(log/error "failed to reorder community category" %)}]})
 
-(defn category-hash
-  [public-key community-id category-id]
-  (hash (str public-key community-id category-id)))
-
-(rf/defn update-category-states-in-db
-  {:events [::category-states-loaded]}
-  [{:keys [db]} community-id hashes states]
-  (let [public-key     (get-in db [:profile/profile :public-key])
-        categories-old (get-in db [:communities community-id :categories])
-        categories     (reduce (fn [acc [category-id category]]
-                                 (let [hash             (get hashes category-id)
-                                       state            (get states hash)
-                                       category-updated (assoc category :state state)]
-                                   (assoc acc category-id category-updated)))
-                               {}
-                               categories-old)]
-    {:db (update-in db [:communities community-id :categories] merge categories)}))
-
 ;; Note - dispatch is used to make sure we are opening community once `pop-to-root` is processed.
 ;; Don't directly merge effects using `navigation/navigate-to`, because it will work in debug and
 ;; release, but for e2e `pop-to-root` closes even currently opened community
