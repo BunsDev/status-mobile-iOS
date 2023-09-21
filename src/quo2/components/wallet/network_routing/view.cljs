@@ -66,7 +66,10 @@
                                       (reanimated/get-shared-value selected-width))))
                            (gesture/on-update
                             (fn [event]
-                              (let [new-pos (+ (oops/oget event "translationX") @initial-gesture-width)]
+                              (let [new-pos (utils.number/value-in-range
+                                             (+ (oops/oget event "translationX") @initial-gesture-width)
+                                             1
+                                             max-width)]
                                 (reanimated/set-shared-value selected-width new-pos))
                               nil))
                            (gesture/on-finalize
@@ -188,21 +191,23 @@
                                                   (js/setTimeout #(reset! selected-network nil) 600))
                                                 400))}]
 
+         (prn "translate 2" (reanimated/get-shared-value selected-width-2))
          [:f> network-bar {:max-width        150
                            :selected-width   selected-width-3
                            :color            "#6BD5F0"
                            :translate-x      translate-3
                            :on-press         (fn []
+                                               (prn "INSIDE translate 2" (reanimated/get-shared-value selected-width-2))
                                                (reanimated/animate translate-1
                                                                    (- (reanimated/get-shared-value selected-width-1))
                                                                    600)
                                                (reanimated/animate translate-2
-                                                                   (- (- (reanimated/get-shared-value selected-width-1))
-                                                                      (reanimated/get-shared-value selected-width-2))
+                                                                   (+ (- (reanimated/get-shared-value selected-width-1))
+                                                                      (- (reanimated/get-shared-value selected-width-2)))
                                                                    600)
                                                (reanimated/animate translate-3
-                                                                   (- (- (reanimated/get-shared-value selected-width-1))
-                                                                      (reanimated/get-shared-value selected-width-2))
+                                                                   (+ (- (reanimated/get-shared-value selected-width-1))
+                                                                      (- (reanimated/get-shared-value selected-width-2)))
                                                                    600)
                                                (reset! selected-network :light-blue))
                            :on-top?          (= @selected-network :light-blue)
