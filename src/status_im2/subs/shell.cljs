@@ -1,6 +1,5 @@
 (ns status-im2.subs.shell
   (:require [re-frame.core :as re-frame]
-            [status-im.multiaccounts.core :as multiaccounts]
             [status-im2.common.resources :as resources]
             [status-im2.config :as config]
             [status-im2.constants :as constants]

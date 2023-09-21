@@ -9,8 +9,8 @@
             [status-im.transport.core :as transport]
             [status-im.communities.core :as communities]
             [status-im.data-store.chats :as data-store.chats]
-            [status-im.multiaccounts.core :as multiaccounts]
             [status-im2.contexts.chat.messages.link-preview.events :as link-preview]
+            [status-im2.contexts.profile.settings.events :as profile.settings]
             [status-im2.common.log :as logging]
             [status-im2.navigation.events :as navigation]))
 
@@ -44,7 +44,7 @@
               (communities/fetch)
               (data-store.chats/fetch-chats-preview
                {:on-success #(re-frame/dispatch [:chats-list/load-success %])})
-              (multiaccounts/switch-preview-privacy-mode-flag)
+              (profile.settings/switch-preview-privacy-mode-flag)
               (link-preview/request-link-preview-whitelist)
               (logging/set-log-level (:log-level profile))
               (navigation/init-root :enable-notifications))))

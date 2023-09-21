@@ -1,21 +1,21 @@
 (ns status-im.multiaccounts.core
   (:require [clojure.string :as string]
-            [quo.platform :as platform]
             [re-frame.core :as re-frame]
+            [native-module.core :as native-module]
+            [quo.platform :as platform]
+            [quo2.foundations.colors :as colors]
             [status-im.bottom-sheet.events :as bottom-sheet]
             [status-im.multiaccounts.update.core :as multiaccounts.update]
-            [native-module.core :as native-module]
-            [utils.re-frame :as rf]
-            [quo2.foundations.colors :as colors]
-            [status-im2.constants :as constants]
-            [status-im2.setup.hot-reload :as hot-reload]
             [status-im2.common.theme.core :as theme]
+            [status-im2.constants :as constants]
+            [status-im2.contexts.shell.jump-to.utils :as shell.utils]
+            [status-im2.setup.hot-reload :as hot-reload]
             [taoensso.timbre :as log]
-            [status-im2.contexts.shell.jump-to.utils :as shell.utils]))
+            [utils.re-frame :as rf]))
 
+;; validate that the given mnemonic was generated from Status Dictionary
 (defn displayed-photo
   [{:keys [images]}]
-  (js/console.log "ALWX images" (clj->js images))
   (or (:thumbnail images)
       (:large images)
       (first images)))
@@ -25,11 +25,6 @@
  (fn [value]
    (when platform/android?
      (native-module/toggle-webview-debug value))))
-
-(re-frame/reg-fx
- ::blank-preview-flag-changed
- (fn [flag]
-   (native-module/set-blank-preview-flag flag)))
 
 (rf/defn confirm-wallet-set-up
   {:events [:multiaccounts.ui/wallet-set-up-confirmed]}
@@ -84,11 +79,6 @@
    :default-sync-period
    value
    {}))
-
-(rf/defn switch-preview-privacy-mode-flag
-  [{:keys [db]}]
-  (let [private? (get-in db [:profile/profile :preview-privacy?])]
-    {::blank-preview-flag-changed private?}))
 
 (re-frame/reg-fx
  :multiaccounts.ui/switch-theme-fx

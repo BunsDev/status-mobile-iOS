@@ -3,7 +3,6 @@
     [quo2.core :as quo]
     [utils.i18n :as i18n]
     ["react-native-image-crop-picker" :default image-picker]
-    [status-im.multiaccounts.core]
     [utils.re-frame :as rf]))
 
 (def crop-size 1000)

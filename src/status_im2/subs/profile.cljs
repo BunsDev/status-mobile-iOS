@@ -247,8 +247,8 @@
    (pos? (count (get multiaccount :images)))))
 
 (defn- replace-multiaccount-image-uri
-  [multiaccount port font-file avatar-opts]
-  (let [{:keys [key-uid ens-name? images]} multiaccount
+  [profile port font-file avatar-opts]
+  (let [{:keys [key-uid ens-name? images]} profile
         theme                              (theme/get-theme)
         avatar-opts                        (assoc avatar-opts :override-ring? (when ens-name? false))
         images-with-uri                    (mapv (fn [{key-uid :keyUid image-name :type :as image}]
@@ -268,15 +268,15 @@
                                                             :theme     theme
                                                             :font-file font-file}
                                                            avatar-opts))}])]
-    (assoc multiaccount :images new-images)))
+    (assoc profile :images new-images)))
 
 (re-frame/reg-sub
  :profile/multiaccount
  :<- [:profile/profile]
  :<- [:mediaserver/port]
  :<- [:initials-avatar-font-file]
- (fn [[multiaccount port font-file] [_ avatar-opts]]
-   (replace-multiaccount-image-uri multiaccount port font-file avatar-opts)))
+ (fn [[profile port font-file] [_ avatar-opts]]
+   (replace-multiaccount-image-uri profile port font-file avatar-opts)))
 
 (re-frame/reg-sub
  :profile/login-profile

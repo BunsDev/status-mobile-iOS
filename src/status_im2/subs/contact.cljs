@@ -235,10 +235,11 @@
    [(re-frame/subscribe [:contacts/contact-by-identity contact-identity])
     (re-frame/subscribe [:profile/profile])])
  (fn [[contact current-profile] [_ contact-identity]]
-   (let [contact (if (= (:public-key current-profile) contact-identity)
-                   contact
-                   current-profile)]
-     [(:primary-name contact) (:secondary-name contact)])))
+   (let [me? (= (:public-key current-profile) contact-identity)]
+     (if me?
+       [(or (:display-name current-profile)
+            (:primary-name contact))]
+       [(:primary-name contact) (:secondary-name contact)]))))
 
 (re-frame/reg-sub
  :contacts/contact-name-by-identity
