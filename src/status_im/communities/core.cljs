@@ -832,26 +832,6 @@
                                categories-old)]
     {:db (update-in db [:communities community-id :categories] merge categories)}))
 
-(rf/defn load-category-states
-  {:events [:communities/load-category-states]}
-  [{:keys [db]} community-id]
-  (let [public-key            (get-in db [:profile/profile :public-key])
-        categories            (get-in db [:communities community-id :categories])
-        {:keys [keys hashes]} (reduce (fn [acc category]
-                                        (let [category-id (get category 0)
-                                              hash        (category-hash
-                                                           public-key
-                                                           community-id
-                                                           category-id)]
-                                          (-> acc
-                                              (assoc-in [:hashes category-id] hash)
-                                              (update :keys #(conj % hash)))))
-                                      {}
-                                      categories)]
-    {:async-storage-get {:keys keys
-                         :cb   #(re-frame/dispatch
-                                 [::category-states-loaded community-id hashes %])}}))
-
 ;; Note - dispatch is used to make sure we are opening community once `pop-to-root` is processed.
 ;; Don't directly merge effects using `navigation/navigate-to`, because it will work in debug and
 ;; release, but for e2e `pop-to-root` closes even currently opened community
