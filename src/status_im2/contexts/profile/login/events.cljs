@@ -1,6 +1,5 @@
 (ns status-im2.contexts.profile.login.events
   (:require
-    [clojure.string :as string]
     [utils.re-frame :as rf]
     [status-im.ethereum.core :as ethereum]
     [utils.security.core :as security]
