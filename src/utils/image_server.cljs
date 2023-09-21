@@ -98,7 +98,7 @@
    "&indicatorCenterToEdge="
    (* indicator-center-to-edge status-im2.common.pixel-ratio/ratio)
    "&addRing="
-   (if ring? 1 0)
+   (if (or (not ring?) (= size 20)) 0 1)
    "&ringWidth="
    (* ring-width status-im2.common.pixel-ratio/ratio)))
 
@@ -144,6 +144,7 @@
   [{:keys [port public-key key-uid theme ring? length size background-color color
            font-size font-file uppercase-ratio indicator-size indicator-border
            indicator-center-to-edge indicator-color full-name ring-width]}]
+  (js/console.log (str "get-initials-avatar-uri " size))
   (str
    image-server-uri-prefix
    port
@@ -181,7 +182,7 @@
    "&indicatorCenterToEdge="
    (* indicator-center-to-edge status-im2.common.pixel-ratio/ratio)
    "&addRing="
-   (if ring? 1 0)
+   (if (or (not ring?) (= size 20)) 0 1)
    "&ringWidth="
    (* ring-width status-im2.common.pixel-ratio/ratio)))
 
