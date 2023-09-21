@@ -135,9 +135,10 @@
 
 (defn contacts-list-item
   [{:keys [from] :as invitation}]
-  (let [contact (or @(re-frame/subscribe [:contacts/contact-by-identity from]) {:public-key from})]
+  (let [{:keys [primary-name] :as contact} (or @(re-frame/subscribe [:contacts/contact-by-identity from])
+                                               {:public-key from})]
     [quo/list-item
-     {:title    (multiaccounts/displayed-name contact)
+     {:title    primary-name
       :icon     [chat-icon/contact-icon-contacts-tab contact]
       :on-press #(re-frame/dispatch [:bottom-sheet/show-sheet-old
                                      {:content (fn []

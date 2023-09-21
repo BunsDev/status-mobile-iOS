@@ -1,7 +1,7 @@
 (ns status-im2.subs.communities
   (:require [clojure.string :as string]
             [re-frame.core :as re-frame]
-            [status-im.multiaccounts.core :as multiaccounts]
+            [status-im2.contexts.contacts.utils :as contacts.utils]
             [status-im.ui.screens.profile.visibility-status.utils :as visibility-status-utils]
             [status-im2.constants :as constants]
             [utils.i18n :as i18n]))
@@ -51,20 +51,16 @@
 (re-frame/reg-sub
  :communities/sorted-community-members
  (fn [[_ community-id]]
-   (let [contacts     (re-frame/subscribe [:contacts/contacts])
-         multiaccount (re-frame/subscribe [:profile/profile])
-         members      (re-frame/subscribe [:communities/community-members community-id])]
-     [contacts multiaccount members]))
- (fn [[contacts multiaccount members] _]
+   (let [contacts (re-frame/subscribe [:contacts/contacts])
+         profile (re-frame/subscribe [:profile/profile])
+         members (re-frame/subscribe [:communities/community-members community-id])]
+     [contacts profile members]))
+ (fn [[contacts profile members] _]
    (let [names (reduce (fn [acc contact-identity]
-                         (let [me?     (= (:public-key multiaccount) contact-identity)
-                               contact (when-not me?
-                                         (multiaccounts/contact-by-identity contacts contact-identity))
-                               name    (first (multiaccounts/contact-two-names-by-identity
-                                               contact
-                                               multiaccount
-                                               contact-identity))]
-                           (assoc acc contact-identity name)))
+                         (let [contact (when-not (= (:public-key profile) contact-identity)
+                                         (contacts.utils/contact-by-identity contacts contact-identity)
+                                         profile)]
+                           (assoc acc contact-identity (:primary-name contact))))
                        {}
                        (keys members))]
      (->> members

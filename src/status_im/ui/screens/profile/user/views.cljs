@@ -192,7 +192,7 @@
     (let [{:keys [public-key
                   compressed-key
                   ens-verified
-                  preferred-name
+                  primary-name
                   key-uid]
            :as   account}
           @(re-frame/subscribe [:profile/multiaccount])
@@ -202,7 +202,7 @@
                                         {:view     :share-chat-key
                                          :address  (or compressed-key
                                                        public-key)
-                                         :ens-name preferred-name}])
+                                         :ens-name primary-name}])
           has-picture @(re-frame/subscribe [:profile/has-picture])]
       [react/view {:flex 1}
        [quo/animated-header
@@ -220,7 +220,7 @@
                                                                          has-picture)}])
                               :color     (user-avatar.style/customization-color customization-color
                                                                                 (theme/get-theme))
-                              :title     (multiaccounts/displayed-name account)
+                              :title     primary-name
                               :photo     (multiaccounts/displayed-photo account)
                               :monospace (not ens-verified)
                               :subtitle  (if (and ens-verified public-key)

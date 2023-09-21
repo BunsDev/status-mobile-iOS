@@ -11,7 +11,7 @@
   []
   (let [entered-password (reagent/atom "")]
     (fn []
-      (let [account                (rf/sub [:profile/multiaccount])
+      (let [{:keys [primary-name] :as account} (rf/sub [:profile/multiaccount])
             {:keys [error button]} (rf/sub [:password-authentication])]
         [rn/view {:padding-horizontal 20}
          [quo/text {:size :heading-1 :weight :semi-bold}
@@ -19,8 +19,8 @@
          [rn/view {:style {:margin-top 8 :margin-bottom 20}}
           [quo/context-tag
            {:size            24
-            :profile-picture (multiaccounts/displayed-photo account)
-            :full-name       (multiaccounts/displayed-name account)}]]
+            :full-name       primary-name
+            :profile-picture (multiaccounts/displayed-photo account)}]]
          [quo/input
           {:type           :password
            :label          (i18n/label :t/profile-password)

@@ -163,11 +163,11 @@
    [photos/photo (multiaccounts/displayed-photo contact) styles]])
 
 (defn contact-icon-contacts-tab
-  [{:keys [primary-name] :as contact}]
+  [{:keys [primary-name] :as profile}]
   [rn/view styles/container-chat-list
    [quo/user-avatar
     {:full-name         primary-name
-     :profile-picture   (multiaccounts/displayed-photo contact)
+     :profile-picture   (multiaccounts/displayed-photo profile)
      :size              :small
      :status-indicator? false}]])
 

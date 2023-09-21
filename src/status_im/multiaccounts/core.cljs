@@ -8,48 +8,14 @@
             [utils.re-frame :as rf]
             [quo2.foundations.colors :as colors]
             [status-im2.constants :as constants]
-            [status-im.utils.gfycat.core :as gfycat]
             [status-im2.setup.hot-reload :as hot-reload]
             [status-im2.common.theme.core :as theme]
             [taoensso.timbre :as log]
-            [status-im2.contexts.shell.jump-to.utils :as shell.utils]
-            [status-im.contact.db :as contact.db]))
-
-;; validate that the given mnemonic was generated from Status Dictionary
-(re-frame/reg-fx
- ::validate-mnemonic
- (fn [[passphrase callback]]
-   (native-module/validate-mnemonic passphrase callback)))
-
-(defn displayed-name
-  "Use preferred name, display-name, name or alias in that order"
-  [{:keys [name display-name preferred-name alias public-key ens-verified primary-name]}]
-  (let [display-name (if (string/blank? display-name) nil display-name)
-        ens-name     (or preferred-name
-                         display-name
-                         name)]
-    ;; Preferred name is our own otherwise we make sure it's verified
-    (if (or preferred-name (and ens-verified name))
-      ens-name
-      (or display-name primary-name alias (gfycat/generate-gfy public-key)))))
-
-(defn contact-by-identity
-  [contacts contact-identity]
-  (or (get contacts contact-identity)
-      (contact.db/public-key->new-contact contact-identity)))
-
-(defn contact-two-names-by-identity
-  [contact profile contact-identity]
-  (let [me? (= (:public-key profile) contact-identity)]
-    (if me?
-      [(or (:preferred-name profile)
-           (:display-name profile)
-           (:primary-name contact)
-           (gfycat/generate-gfy contact-identity))]
-      [(:primary-name contact) (:secondary-name contact)])))
+            [status-im2.contexts.shell.jump-to.utils :as shell.utils]))
 
 (defn displayed-photo
   [{:keys [images]}]
+  (js/console.log "ALWX images" (clj->js images))
   (or (:thumbnail images)
       (:large images)
       (first images)))
@@ -230,8 +196,3 @@
   [cofx pics]
   (multiaccounts.update/optimistic cofx :images pics))
 
-(comment
-  ;; Test seed for Dim Venerated Yaffle, it's not here by mistake, this is just a test account
-  (native-module/validate-mnemonic
-   "rocket mixed rebel affair umbrella legal resemble scene virus park deposit cargo"
-   prn))

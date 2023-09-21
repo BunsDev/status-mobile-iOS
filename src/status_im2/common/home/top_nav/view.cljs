@@ -23,12 +23,11 @@
    :jump-to? true/false
    :container-style passed to outer view of component}"
   [{:keys [container-style blur? jump-to?]}]
-  (let [{:keys [public-key]} (rf/sub [:profile/profile])
+  (let [{:keys [public-key primary-name] :as account} (rf/sub [:profile/multiaccount])
         online?              (rf/sub [:visibility-status-updates/online? public-key])
-        account              (rf/sub [:profile/multiaccount])
         customization-color  (rf/sub [:profile/customization-color])
         avatar               {:online?         online?
-                              :full-name       (multiaccounts/displayed-name account)
+                              :full-name       primary-name
                               :profile-picture (multiaccounts/displayed-photo account)}
         network-type         (rf/sub [:network/type])
         unread-count         (rf/sub [:activity-center/unread-count])

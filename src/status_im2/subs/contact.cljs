@@ -4,9 +4,9 @@
             [re-frame.core :as re-frame]
             [status-im.contact.db :as contact.db]
             [status-im.ethereum.core :as ethereum]
-            [status-im.multiaccounts.core :as multiaccounts]
             [status-im.ui.screens.profile.visibility-status.utils :as visibility-status-utils]
             [status-im.utils.gfycat.core :as gfycat]
+            [status-im2.contexts.contacts.utils :as contacts.utils]
             [status-im2.constants :as constants]
             [utils.collection]
             [utils.i18n :as i18n]
@@ -212,7 +212,7 @@
  :contacts/contact-by-identity
  :<- [:contacts/contacts]
  (fn [contacts [_ contact-identity]]
-   (multiaccounts/contact-by-identity contacts contact-identity)))
+   (contacts.utils/contact-by-identity contacts contact-identity)))
 
 (re-frame/reg-sub
  :contacts/contact-added?
@@ -228,15 +228,17 @@
  (fn [[contact] _]
    (:blocked contact)))
 
+;; TODO(alwx):
 (re-frame/reg-sub
  :contacts/contact-two-names-by-identity
  (fn [[_ contact-identity] _]
    [(re-frame/subscribe [:contacts/contact-by-identity contact-identity])
     (re-frame/subscribe [:profile/profile])])
- (fn [[contact current-multiaccount] [_ contact-identity]]
-   (multiaccounts/contact-two-names-by-identity contact
-                                                current-multiaccount
-                                                contact-identity)))
+ (fn [[contact current-profile] [_ contact-identity]]
+   (let [contact (if (= (:public-key current-profile) contact-identity)
+                   contact
+                   current-profile)]
+     [(:primary-name contact) (:secondary-name contact)])))
 
 (re-frame/reg-sub
  :contacts/contact-name-by-identity
@@ -259,8 +261,7 @@
                      :text (get-in message [:content :text])}
           :ens-name (:preferred-name current-multiaccount)
           :alias    (gfycat/generate-gfy from-identity)}
-         (let [contact (or (contacts from-identity)
-                           (contact.db/public-key->new-contact from-identity))]
+         (let [contact (contacts.utils/contact-by-identity contacts from-identity)]
            {:quote    {:from from-identity
                        :text (get-in message [:content :text])}
             :ens-name (when (:ens-verified contact)

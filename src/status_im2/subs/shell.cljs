@@ -4,6 +4,7 @@
             [status-im2.common.resources :as resources]
             [status-im2.config :as config]
             [status-im2.constants :as constants]
+            [status-im2.contexts.contacts.utils :as contacts.utils]
             [status-im2.contexts.shell.jump-to.constants :as shell.constants]
             [utils.datetime :as datetime]
             [utils.i18n :as i18n]))
@@ -167,15 +168,12 @@
     (re-frame/subscribe [:communities])
     (re-frame/subscribe [:contacts/contacts])
     (re-frame/subscribe [:profile/profile])])
- (fn [[chat communities contacts current-multiaccount] [_ id]]
-   (let [from         (get-in chat [:last-message :from])
-         contact      (when from (multiaccounts/contact-by-identity contacts from))
-         primary-name (when from
-                        (first (multiaccounts/contact-two-names-by-identity
-                                contact
-                                current-multiaccount
-                                from)))]
-     (private-group-chat-card chat id communities primary-name))))
+ (fn [[chat communities contacts current-profile] [_ id]]
+   (let [from (get-in chat [:last-message :from])
+         contact (if from
+                   (contacts.utils/contact-by-identity contacts from)
+                   current-profile)]
+     (private-group-chat-card chat id communities (:primary-name contact)))))
 
 (re-frame/reg-sub
  :shell/community-card
