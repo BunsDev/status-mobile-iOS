@@ -97,8 +97,9 @@
                               :border-right-color "#1A7702"}}])
 
 (defn view-internal []
-  (let [selected-network    (reagent/atom nil)]
-    (fn []
+  (let [selected-network (reagent/atom nil)
+        total-width      (reagent/atom 0)]
+    (fn [{:keys [total-amount networks]}]
       (let [
             selected-width-1 (reanimated/use-shared-value 110)
             selected-width-2 (reanimated/use-shared-value 60)
@@ -107,15 +108,22 @@
             translate-1      (reanimated/use-shared-value 0)
             translate-2      (reanimated/use-shared-value 0)
             translate-3      (reanimated/use-shared-value 0)
-            ]
-        [rn/view {:style {;:margin-horizontal 20
-                          :flex-direction   :row
-                          :height           64
-                          :background-color :lightgrey
-                          :border-radius    20 ;; TODO: check border-radius
-                          :overflow         :hidden}}
+            ;;
 
-         [reanimated/view {:style {:position           :absolute
+            ]
+        (prn @total-width)
+        [rn/view {:style     { ;:margin-horizontal 20
+                              :flex-direction   :row
+                              :height           64
+                              :background-color :lightgrey
+                              :border-radius    20 ;; TODO: check border-radius
+                              :overflow         :hidden
+                              ;;
+                              }
+                  :on-layout #(reset! total-width (oops/oget % "nativeEvent.layout.width"))}
+
+         ;; TODO: do it
+         #_[reanimated/view {:style {:position           :absolute
                                    :top                0
                                    :bottom             0
                                    :left               0
@@ -124,38 +132,41 @@
                                    :border-right-width 1
                                    :border-style       :dashed
                                    :border-right-color "#1A7702"}}]
+         #_(map (fn [{:keys [amount max-amount color]}]
+                nil)
+              networks)
 
          ;; TODO: add white left or right border
-         [:f> network-bar {:max-width          160
-                           :selected-width     selected-width-1
-                           :color              "#758EEB"
-                           :translate-x        translate-1
-                           :on-press           (fn []
-                                                 (reanimated/animate translate-2
-                                                                     (+ (- (reanimated/get-shared-value selected-width-1))
-                                                                        (- (reanimated/get-shared-value selected-width-2))
-                                                                        (- (- 160 (reanimated/get-shared-value selected-width-1))))
-                                                                     700)
-                                                 (reanimated/animate translate-3
-                                                                     (+ (- (reanimated/get-shared-value selected-width-1))
-                                                                        (- (reanimated/get-shared-value selected-width-2))
-                                                                        (- (reanimated/get-shared-value selected-width-3))
-                                                                        (- (- 160 (reanimated/get-shared-value selected-width-1))))
-                                                                     700)
-                                                 (reset! selected-network :blue))
-                           :on-top?            (= @selected-network :blue)
-                           :on-selection-end   (fn []
-                                                 (reanimated/animate translate-1
-                                                                     (- (reanimated/get-shared-value selected-width-1))
-                                                                     400)
-                                                 (js/setTimeout
-                                                  (fn []
+         [:f> network-bar {:max-width        160
+                           :selected-width   selected-width-1
+                           :color            "#758EEB"
+                           :translate-x      translate-1
+                           :on-press         (fn []
+                                               (reanimated/animate translate-2
+                                                                   (+ (- (reanimated/get-shared-value selected-width-1))
+                                                                      (- (reanimated/get-shared-value selected-width-2))
+                                                                      (- (- 160 (reanimated/get-shared-value selected-width-1))))
+                                                                   700)
+                                               (reanimated/animate translate-3
+                                                                   (+ (- (reanimated/get-shared-value selected-width-1))
+                                                                      (- (reanimated/get-shared-value selected-width-2))
+                                                                      (- (reanimated/get-shared-value selected-width-3))
+                                                                      (- (- 160 (reanimated/get-shared-value selected-width-1))))
+                                                                   700)
+                                               (reset! selected-network :blue))
+                           :on-top?          (= @selected-network :blue)
+                           :on-selection-end (fn []
+                                               (reanimated/animate translate-1
+                                                                   (- (reanimated/get-shared-value selected-width-1))
+                                                                   400)
+                                               (js/setTimeout
+                                                (fn []
 
-                                                    (reanimated/animate translate-1 0 600)
-                                                    (reanimated/animate translate-2 0 600)
-                                                    (reanimated/animate translate-3 0 600)
-                                                    (js/setTimeout #(reset! selected-network nil) 600))
-                                                  400))}]
+                                                  (reanimated/animate translate-1 0 600)
+                                                  (reanimated/animate translate-2 0 600)
+                                                  (reanimated/animate translate-3 0 600)
+                                                  (js/setTimeout #(reset! selected-network nil) 600))
+                                                400))}]
 
          [:f> network-bar {:max-width        100
                            :selected-width   selected-width-2
@@ -190,14 +201,11 @@
                                                   (reanimated/animate translate-3 0 600)
                                                   (js/setTimeout #(reset! selected-network nil) 600))
                                                 400))}]
-
-         (prn "translate 2" (reanimated/get-shared-value selected-width-2))
          [:f> network-bar {:max-width        150
                            :selected-width   selected-width-3
                            :color            "#6BD5F0"
                            :translate-x      translate-3
                            :on-press         (fn []
-                                               (prn "INSIDE translate 2" (reanimated/get-shared-value selected-width-2))
                                                (reanimated/animate translate-1
                                                                    (- (reanimated/get-shared-value selected-width-1))
                                                                    600)
@@ -235,5 +243,5 @@
                                    :background-color :skyblue}}]
          ]))))
 
-(defn view []
-  [:f> view-internal])
+(defn view [params]
+  [:f> view-internal params])
