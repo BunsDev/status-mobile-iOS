@@ -33,13 +33,13 @@
 (defn preview
   []
   (let [descriptor-state (reagent/atom {:total-amount 200
-                                        :networks     2
-                                        :max-amount-0 80
-                                        :max-amount-1 80
-                                        :max-amount-2 80
-                                        :max-amount-3 80
-                                        :max-amount-4 80
-                                        :max-amount-5 80})]
+                                        :networks     3
+                                        :max-amount-0 250
+                                        :max-amount-1 250
+                                        :max-amount-2 250
+                                        :max-amount-3 250
+                                        :max-amount-4 250
+                                        :max-amount-5 250})]
     (fn []
       (let [descriptor      (->> (range (:networks @descriptor-state))
                                  (mapcat network-descriptor)
